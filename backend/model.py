@@ -126,17 +126,33 @@ def detect_objects(image_bytes):
 
     detected_objects = []
     for label, score in zip(labels, scores):
-        detected_objects.append({
-            'object': COCO_LABELS.get(label.item() - 1, 'object'),  # -1 -> countering off-by-one error
-            'confidence': score.item()
-        })
+        if (COCO_LABELS.get(label.item() - 1, 'object')) != 'object':
+            detected_objects.append({
+                'object': COCO_LABELS.get(label.item() - 1, 'object'),  # -1 -> countering off-by-one error
+                'confidence': score.item()  # confidence
+            })
+        else:
+            continue
 
-    return detected_objects
+    detected_objects_for_hashtag = []
+    detected_objects.sort(key=lambda x: x['confidence'], reverse=True)  # sort in desc order of confidence of prediction
+    # print(detected_objects)
+    for k in detected_objects:
+        detected_objects_for_hashtag.append(k['object'])
+    return detected_objects_for_hashtag
 
 
-file_path = 'temp/dog.jpg'
+def not_detected_objects(*input_objects):
+    detected_objects_for_hashtag = []
+    for obj in input_objects:
+        detected_objects_for_hashtag.append(obj)
+
+    return detected_objects_for_hashtag
+
+
+file_path = '../temp/duck.png'
 with open(file_path, 'rb') as f:
     image_bytes = f.read()
 
 results = detect_objects(image_bytes)
-print(results)
+print(results)  # list of detected objects with their probabilities
