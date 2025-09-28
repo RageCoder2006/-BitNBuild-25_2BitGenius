@@ -18,15 +18,21 @@ def get_image_mood(image_bytes):
     r, g, b = avg_rgb / 255
     h, s, v = colorsys.rgb_to_hsv(r, g, b)
     if s < 0.2 and v > 0.75:
-        return {"mood": "serenity"}
+        detected_mood = "serenity"
     elif 0.5 <= h <= 0.7:
         if v < 0.5:
-            return {"mood": "sad"}
+            detected_mood = "sad"
         else:
-            return {"mood": "calm"}
+            detected_mood = "calm"
     elif 0.12 < h < 0.18 and v > 0.2:
-        return {"mood": "joy"}
-    return {"mood": "neutral"}
+        detected_mood = "joy"
+    else:
+        detected_mood = "neutral"
+
+    # **NEW: Return mood with complete theme data**
+    return {
+        "mood": detected_mood,
+    }
 
 
 def detect_objects(image_bytes):
@@ -83,14 +89,3 @@ def not_detected_objects(*input_objects):
     for obj in input_objects:
         detected_objects_for_hashtag.append(obj)
     return detected_objects_for_hashtag
-
-
-# your comments and test block below remain unchanged
-'''
-file_path = '../temp/flower.png'
-with open(file_path, 'rb') as f:
-    image_bytes = f.read()
-mood = get_image_mood(image_bytes)
-results = detect_objects(image_bytes)
-print(mood)  # list of detected objects with their probabilities
-'''
