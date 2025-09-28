@@ -8,6 +8,7 @@ __pycache__/
 temp/
 *.xml
 *.iml
+*.env
 
 # Distribution / packaging
 .Python
