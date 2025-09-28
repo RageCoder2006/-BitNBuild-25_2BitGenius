@@ -29,16 +29,17 @@ async def process_image(file: UploadFile = File(...)):
     objects = model.detect_objects(image_bytes)
     mood_data = model.get_image_mood(image_bytes)
 
-    '''captions = generate_captions(objects, mood_data['mood'])  # gemini api
+    captions = generate_captions(objects, mood_data['mood'])  # gemini api
     hashtags = generate_hashtags(objects)  # gemini api
-    "captions": captions, # string or list output
-        "hashtags": hashtags # string or list output'''
+
     return {
         "detected_objects": objects, # list output
         "mood": mood_data, # dictionary output
+        "captions": captions,  # string or list output
+        "hashtags": hashtags  # string or list output
     }
 
-'''
+
 def generate_captions(objects, mood):
     if not objects:
         return ["Great shot!"]
@@ -54,8 +55,9 @@ def generate_captions(objects, mood):
         """
         response = gemini_model.generate_content(prompt)
         print(f"DEBUG: Raw Gemini response: {response}")  # **DEBUG**
-        print(f"DEBUG: Response text: {response.text} \n {type(response.text)}")
-        return response.text
+        print(f"DEBUG: Response text: {response.text}")
+        captions = json.loads((response.text))
+        return captions
 
     except Exception as e:
         object_names = objects[:3]
@@ -70,7 +72,7 @@ def generate_captions(objects, mood):
 def generate_hashtags(objects):
     try:
         prompt = f"""
-        Generate 8-10 trending hashtags for a social media post featuring: {', '.join(objects[:5])}
+        Generate 8-10 trending hashtags for a social media post featuring: {', '.join(objects)}
 
         Include:
         - Object-specific hashtags
@@ -78,7 +80,6 @@ def generate_hashtags(objects):
         - Photography-related hashtags
 
         Return as a JSON array of hashtag strings (include # symbol).
-        also send hello world irrespective of hastags
         """
 
         response = gemini_model.generate_content(prompt)
@@ -91,7 +92,6 @@ def generate_hashtags(objects):
             hashtags.append(f"#{obj.replace(' ', '').lower()}")
         hashtags.extend(["#photography", "#ai", "#content"])
         return hashtags
-'''
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="localhost", port=8000, reload=True)
