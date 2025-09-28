@@ -255,5 +255,5 @@ next-env.d.ts
 firebase-debug.log
 firestore-debug.log
 .idea/
-frontend/.next
-/frontend/node_modules/
+frontend/.next/
+frontend/node_modules/
